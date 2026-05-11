@@ -51,15 +51,18 @@ async def admin_check(interaction: discord.Interaction):
 
 ## Permission Presets
 
-| Preset Name | Required Permissions |
+| Preset | Required Permissions |
 | :--- | :--- |
 | `"bot_owner"` | Restricts usage to the bot owner/team owners. |
-| `"admin"` | Administrator |
-| `"moderator"` | Manage Messages, Kick Members, Ban Members |
-| `"manager"` | Manage Guild, Roles, and Channels |
-| `"support"` | Manage Messages, Read Message History |
-| `"technical"` | Manage Webhooks, Manage Guild |
-| `"giveaways"` | Manage Guild, Manage Messages |
+| `moderator` | Manage Messages, Kick Members, Ban Members |
+| `admin` | Administrator |
+| `giveaways` | Manage Guild, Manage Messages |
+| `automation` | Manage Guild, Manage Messages, Manage Channels |
+| `manager` | Manage Guild, Manage Roles, Manage Channels |
+| `support` | Manage Messages, Read Message History |
+| `security` | View Audit Log, Moderate Members |
+| `community` | Manage Expressions, Manage Threads, Create Public Threads |
+| `technical` | Manage Webhooks, Manage Guild |
 
 ---
 

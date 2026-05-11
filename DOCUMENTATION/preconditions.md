@@ -13,10 +13,10 @@ The **Preconditions** feature provides set of decorators for `discord.py` slash 
 Instead of listing every required permission manually, you can use pre-defined presets tailored for specific roles.
 
 * **Usage:** `@preconditions.permissions_preset("moderator")`
-* **Special Case:** Use `"bot_owner"` to restrict a command exclusively to the developer.
 
 | Preset | Required Permissions |
 | :--- | :--- |
+| `"bot_owner"` | Restricts usage to the bot owner/team owners. |
 | `moderator` | Manage Messages, Kick Members, Ban Members |
 | `admin` | Administrator |
 | `giveaways` | Manage Guild, Manage Messages |
