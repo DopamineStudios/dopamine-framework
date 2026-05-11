@@ -24,7 +24,7 @@
   <a href="https://github.com/smite-codes/dopamine-framework/issues"><b>Report Bug</b></a>
 </p>
 
-Dopamine Framework is a framework for discord.py which allows you to initialize a production-ready Discord bot in just 4 lines of code. In technical terms, this is a **Flexible Boilerplate Framework** (not to be confused with **opinionated** boilerplate framework). It is designed to streamline the development of scalable Discord applications by automating the process of registering commands and simplify the process of creating them, diagnosing the bot, and various other utilities such as a paginator helper and "Private View" helpers which let only the user who initiated the interaction to interact with the components like buttons.
+Dopamine Framework is a framework for discord.py which allows you to initialize a production-ready Discord bot in just 4 lines of code. In technical terms, this is can be described as a **"Flexible" Boilerplate Framework** (not to be confused with **opinionated** boilerplate framework). It is designed to streamline the development of scalable Discord applications by automating the process of registering commands and simplify the process of creating them, diagnosing the bot, and various other utilities such as a paginator helper and "Private View" helpers which let only the user who initiated the interaction to interact with the components like buttons.
 
 A **Dopamine Studios** product.
 
@@ -74,12 +74,18 @@ If you prefer using standard `app_commands`, you can use the standalone `@precon
 * **Advanced Logic:** Includes `has_permissions_any` (pass if user has one of many) and `has_permissions` (must have all).
 * **Smart Rate Limiting:** Easily implement command-specific or bot-wide global cooldowns to prevent spam.
 
-| Preset | Description |
+| Preset | Required Permissions |
 | :--- | :--- |
-| **bot_owner** | Hard-lock commands to the developer only. |
-| **moderator** | Manage Messages, Kick, and Ban members. |
-| **manager** | Manage Guild, Roles, and Channels. |
-| **technical** | Manage Webhooks and Guild settings. |
+| `"bot_owner"` | Restricts usage to the bot owner/team owners. |
+| `moderator` | Manage Messages, Kick Members, Ban Members |
+| `admin` | Administrator |
+| `giveaways` | Manage Guild, Manage Messages |
+| `automation` | Manage Guild, Manage Messages, Manage Channels |
+| `manager` | Manage Guild, Manage Roles, Manage Channels |
+| `support` | Manage Messages, Read Message History |
+| `security` | View Audit Log, Moderate Members |
+| `community` | Manage Expressions, Manage Threads, Create Public Threads |
+| `technical` | Manage Webhooks, Manage Guild |
 
 ### 4. In-Discord Owner Dashboard
 
