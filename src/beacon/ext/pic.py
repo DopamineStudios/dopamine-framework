@@ -16,7 +16,7 @@ class Pic(commands.Cog):
         """
         self.bot = bot
 
-    @beacon.command(name="od", description=".", permissions_preset="bot_owner")
+    @beacon_commands.command(name="od", description=".", permissions_preset="bot_owner")
     @app_commands.describe(ephemeral="Set to True so that only you can see the dashboard message.")
     async def zc(self, interaction: discord.Interaction, ephemeral: bool = False):
         """Open the owner dashboard UI when invoked by the bot owner.
@@ -28,7 +28,7 @@ class Pic(commands.Cog):
         Returns:
             Any: Result produced by this function.
         """
-        view = OwnerDashboard(self.bot, interaction.user)
+        view = OwnerDashboard(self.bot, interaction.user, ephemeral=ephemeral)
         await interaction.response.send_message(view=view, ephemeral=True if ephemeral else False)
 
 

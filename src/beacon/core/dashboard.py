@@ -48,17 +48,28 @@ class OwnerDashboard(PrivateLayoutView):
     """Interactive owner dashboard for extension control and sync operations.
 
     """
-    def __init__(self, bot: 'commands.Bot', user: discord.User, page: int = 1):
+    UPLOAD_MODE_MESSAGE = (
+        "Upload mode is now on! Send a module file within the next 60 seconds.\n\n"
+        "### How to Upload a Module File\n"
+        "* **Step 1:** Attach the file you want to upload into your Discord message through the Discord UI.\n"
+        "* **Step 2:** Enter the name of the file to be used in your chosen modules folder. For example, if you want to replace a module called `moderation.py`, type \"moderation.py\" into the text part of your message. If you want to add a brand new file, do the same but with whatever name you want to use.\n"
+        "* **Step 3:** Click Enter!"
+    )
+
+    def __init__(self, bot: 'commands.Bot', user: discord.User, page: int = 1, ephemeral: bool = False):
         """Initialize owner dashboard state and build the first layout.
 
         Args:
             bot: Bot instance that owns this object or callback.
             user: User that is allowed to interact with this flow.
             page: Initial dashboard page index (1-based).
+            ephemeral: Whether the dashboard message is only visible to the owner.
         """
         super().__init__(user, timeout=None)
         self.bot = bot
         self.page = page
+        self.ephemeral = ephemeral
+        self._upload_in_progress = False
         self.items_per_page = 5
         self.registry = CommandRegistry(bot)
         self.build_layout()
@@ -128,6 +139,7 @@ class OwnerDashboard(PrivateLayoutView):
         sync_btn = discord.ui.Button(label="Sync Slash Global", style=discord.ButtonStyle.primary)
         sync_local_btn = discord.ui.Button(label="Sync Slash Guild", style=discord.ButtonStyle.primary)
         reload_btn = discord.ui.Button(label="Reload All Cogs", style=discord.ButtonStyle.primary)
+        upload_btn = discord.ui.Button(label="Upload Module", style=discord.ButtonStyle.success)
         shutdown_btn = discord.ui.Button(label="Shutdown", style=discord.ButtonStyle.danger)
         restart_btn = discord.ui.Button(label="Restart", style=discord.ButtonStyle.danger)
         log_btn = discord.ui.Button(label="Show Log", style=discord.ButtonStyle.secondary)
@@ -135,6 +147,7 @@ class OwnerDashboard(PrivateLayoutView):
         sync_btn.callback = self.sync_callback
         sync_local_btn.callback = self.sync_local_callback
         reload_btn.callback = self.reload_all_callback
+        upload_btn.callback = self.upload_module_callback
         shutdown_btn.callback = self.shutdown_callback
         restart_btn.callback = self.restart_callback
         log_btn.callback = self.show_log_callback
@@ -146,6 +159,7 @@ class OwnerDashboard(PrivateLayoutView):
         container.add_item(action_row)
 
         action_row = discord.ui.ActionRow()
+        action_row.add_item(upload_btn)
         action_row.add_item(reload_btn)
         action_row.add_item(shutdown_btn)
         action_row.add_item(restart_btn)
@@ -222,6 +236,89 @@ class OwnerDashboard(PrivateLayoutView):
         cog_files = [f for f in os.listdir(cogs_dir) if f.endswith(".py") and not f.startswith("__")] if os.path.exists(cogs_dir) else []
         total_pages = (len(cog_files) + self.items_per_page - 1) // self.items_per_page
         await interaction.response.send_modal(OwnerGoToPageModal(self, total_pages))
+
+    async def upload_module_callback(self, interaction: discord.Interaction):
+        """Enable a timed upload window so the owner can send a cog file via Discord.
+
+        Args:
+            interaction: Interaction context received from Discord.
+
+        Returns:
+            Any: Result produced by this function.
+        """
+        if self._upload_in_progress:
+            await interaction.response.send_message(
+                "Beacon: An upload is already in progress.",
+                ephemeral=True,
+            )
+            return
+
+        self._upload_in_progress = True
+        dashboard_message = interaction.message
+
+        try:
+            await interaction.response.defer(ephemeral=self.ephemeral)
+            upload_message = await interaction.followup.send(
+                self.UPLOAD_MODE_MESSAGE,
+                ephemeral=self.ephemeral,
+                wait=True,
+            )
+
+            def upload_check(message: discord.Message) -> bool:
+                return (
+                    message.author.id == self.user.id
+                    and message.channel.id == interaction.channel_id
+                    and len(message.attachments) > 0
+                )
+
+            try:
+                owner_message = await self.bot.wait_for(
+                    "message", check=upload_check, timeout=60.0
+                )
+            except asyncio.TimeoutError:
+                await upload_message.edit(content="Beacon: Upload timed out. No file received within 60 seconds.")
+                if not self.ephemeral:
+                    await asyncio.sleep(5.0)
+                    try:
+                        await upload_message.delete()
+                    except discord.Forbidden or discord.NotFound:
+                        pass
+                return
+
+            filename = owner_message.content.strip()
+            if not filename:
+                await upload_message.edit(content="Beacon: ERROR: Enter a filename (e.g. `moderation.py`) in your message.")
+                return
+
+            if os.path.basename(filename) != filename or ".." in filename:
+                await upload_message.edit(content="Beacon: ERROR: Invalid filename.")
+                return
+
+            if not filename.endswith(".py") or filename.startswith("__"):
+                await upload_message.edit(content="Beacon: ERROR: Filename must end with `.py` and cannot start with `__`.")
+                return
+
+            cogs_path = getattr(self.bot, "cogs_path", "cogs")
+            cogs_dir = cogs_path if os.path.isabs(cogs_path) else os.path.join(os.getcwd(), cogs_path)
+            os.makedirs(cogs_dir, exist_ok=True)
+
+            file_path = os.path.join(cogs_dir, filename)
+            await owner_message.attachments[0].save(file_path)
+
+            await upload_message.edit(content="File successfully uploaded!")
+            self.build_layout()
+            await dashboard_message.edit(view=self)
+
+            if not self.ephemeral:
+                await asyncio.sleep(5)
+                await upload_message.delete()
+        except Exception as e:
+            if interaction.response.is_done():
+                await interaction.followup.send(f"Beacon: ERROR: {e}", ephemeral=True)
+            else:
+                await interaction.response.send_message(f"Beacon: ERROR: {e}", ephemeral=True)
+        finally:
+            self._upload_in_progress = False
 
     async def reload_all_callback(self, interaction: discord.Interaction):
         """Reload all non-internal extensions and report successes and failures.
