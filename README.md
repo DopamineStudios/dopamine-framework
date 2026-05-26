@@ -6,13 +6,13 @@
 
 <p align="center">
   <a href="https://pypi.org/project/discord-beacon/">
-    <img src="https://img.shields.io/pypi/v/beacon?style=for-the-badge&logo=pypi&color=blue" />
+    <img src="https://img.shields.io/pypi/v/discord-beacon?style=for-the-badge&logo=pypi&color=blue" />
   </a>
   <a href="https://www.python.org/">
   <img src="https://img.shields.io/badge/python-3.12+-yellow?style=for-the-badge&logo=python&logoColor=white" />
 </a>
-  <a href="https://github.com/smite-codes/beacon/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/smite-codes/beacon?style=for-the-badge&color=orange" />
+  <a href="https://github.com/dopaminestudios/beacon/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/dopaminestudios/beacon?style=for-the-badge&color=orange" />
   </a>
 </p>
 
