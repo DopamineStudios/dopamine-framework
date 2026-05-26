@@ -1,3 +1,12 @@
+## [v3.0.1](https://github.com/DopamineStudios/beacon/compare/vv3.0.0...vv3.0.1) (2026-05-26)
+### Bug Fixes
+
+* Updated default colour to new colour scheme of Beacon. ([e251343](https://github.com/DopamineStudios/beacon/commit/e2513436822f0ed0c0054798344dda30e5e8df81))
+
+### Documentation Changes
+
+* Fixed README images. ([20db122](https://github.com/DopamineStudios/beacon/commit/20db122b1af92bfbec1a1ff9701a754e75d6c353))
+
 ## [v3.0.0](https://github.com/DopamineStudios/beacon/compare/vv2.3.0...vv3.0.0) (2026-05-25)
 ### ⚠ BREAKING CHANGES
 
